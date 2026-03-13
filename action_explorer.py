@@ -77,12 +77,11 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('<button class="count-btn" onclick="showSelected()">Show Selected</button>')
         r.append('<button class="count-btn" onclick="prepareCreateCBZ()">Create CBZ</button>')
         r.append('</div>')
-        r.append('</div>')
         r.append('<table>')
-        r.append('<tr><th style="width: 30px;"></th><th>Name</th><th>Size</th><th>Modified</th></tr>')
+        r.append('<tr><th style="width: 30px;"></th><th>Name</th><th>Items</th><th>Size</th><th>Modified</th></tr>')
         
         if self.path != '/':
-            r.append('<tr><td></td><td><a href="../" class="dir">📁 ../ (Parent Directory)</a></td><td>-</td><td>-</td></tr>')
+            r.append('<tr><td></td><td><a href="../" class="dir">📁 ../ (Parent Directory)</a></td><td>-</td><td>-</td><td>-</td></tr>')
 
         for name in list_dir:
             fullname = os.path.join(path, name)
@@ -119,6 +118,21 @@ class CustomHandler(SimpleHTTPRequestHandler):
             except OSError:
                 size_str = '-'
                 mtime = '-'
+            
+            # Count items in subdirectory
+            items_str = '-'
+            items_title = ''
+            if is_dir:
+                try:
+                    sub_entries = os.listdir(fullname)
+                    sub_files = sum(1 for e in sub_entries if os.path.isfile(os.path.join(fullname, e)))
+                    sub_dirs = sum(1 for e in sub_entries if os.path.isdir(os.path.join(fullname, e)))
+                    total = sub_files + sub_dirs
+                    items_str = str(total)
+                    items_title = f'{sub_files} file(s), {sub_dirs} folder(s)'
+                except OSError:
+                    items_str = '?'
+                    items_title = 'Cannot read folder'
                 
             linkname = urllib.parse.quote(linkname, errors='surrogatepass')
             escaped_displayname = html.escape(displayname)
@@ -130,9 +144,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
             row_id = html.escape(name).replace(' ', '_').replace('(', '').replace(')', '').replace('.', '_').replace("'", '').replace('&', '').replace('+', '').replace(',', '')
             
             if is_dir:
-                r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class} onclick="saveFolderScroll(\'{html.escape(name)}\')">{escaped_displayname}</a></td><td>{size_str}</td><td>{mtime}</td></tr>')
+                r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class} onclick="saveFolderScroll(\'{html.escape(name)}\')">{escaped_displayname}</a></td><td title="{items_title}" style="color:#555;font-size:0.9em">{items_str}</td><td>{size_str}</td><td>{mtime}</td></tr>')
             else:
-                r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class}>{escaped_displayname}</a></td><td>{size_str}</td><td>{mtime}</td></tr>')
+                r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class}>{escaped_displayname}</a></td><td>-</td><td>{size_str}</td><td>{mtime}</td></tr>')
             
         r.append('</table>\n')
         
