@@ -126,7 +126,13 @@ class CustomHandler(SimpleHTTPRequestHandler):
             is_dir_str = "true" if is_dir else "false"
             chk_box = f'<input type="checkbox" class="item-chk" value="{html.escape(name)}" data-isdir="{is_dir_str}" onchange="updateSelectedFiles()">'
             
-            r.append(f'<tr><td>{chk_box}</td><td><a href="{linkname}" {a_class}>{escaped_displayname}</a></td><td>{size_str}</td><td>{mtime}</td></tr>')
+            # Sanitize name for use as an HTML id
+            row_id = html.escape(name).replace(' ', '_').replace('(', '').replace(')', '').replace('.', '_').replace("'", '').replace('&', '').replace('+', '').replace(',', '')
+            
+            if is_dir:
+                r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class} onclick="saveFolderScroll(\'{html.escape(name)}\')\'">{escaped_displayname}</a></td><td>{size_str}</td><td>{mtime}</td></tr>')
+            else:
+                r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class}>{escaped_displayname}</a></td><td>{size_str}</td><td>{mtime}</td></tr>')
             
         r.append('</table>\n')
         
@@ -165,6 +171,27 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('  }')
         r.append('}')
         
+        r.append('function saveFolderScroll(folderName) {')
+        r.append('  sessionStorage.setItem("scrollTarget:" + window.location.pathname, folderName);')
+        r.append('}')
+        r.append('window.addEventListener("DOMContentLoaded", function() {')
+        r.append('  let key = "scrollTarget:" + window.location.pathname;')
+        r.append('  let target = sessionStorage.getItem(key);')
+        r.append('  if (target) {')
+        r.append('    sessionStorage.removeItem(key);')
+        r.append('    let rows = document.querySelectorAll("tr");')
+        r.append('    for (let row of rows) {')
+        r.append('      let link = row.querySelector("a");')
+        r.append('      if (link && link.textContent.trim().replace(/^📁\\s*/, "").replace(/\\/$/, "") === target) {')
+        r.append('        row.scrollIntoView({ behavior: "smooth", block: "center" });')
+        r.append('        row.style.transition = "background 0.5s";')
+        r.append('        row.style.background = "#fffbcc";')
+        r.append('        setTimeout(() => { row.style.background = ""; }, 2000);')
+        r.append('        break;')
+        r.append('      }')
+        r.append('    }')
+        r.append('  }')
+        r.append('});')
         r.append('function hideWarning() {')
         r.append('  let warningDiv = document.getElementById("topWarning");')
         r.append('  if (warningDiv) warningDiv.style.display = "none";')
