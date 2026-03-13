@@ -130,7 +130,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             row_id = html.escape(name).replace(' ', '_').replace('(', '').replace(')', '').replace('.', '_').replace("'", '').replace('&', '').replace('+', '').replace(',', '')
             
             if is_dir:
-                r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class} onclick="saveFolderScroll(\'{html.escape(name)}\')\'">{escaped_displayname}</a></td><td>{size_str}</td><td>{mtime}</td></tr>')
+                r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class} onclick="saveFolderScroll(\'{html.escape(name)}\')">{escaped_displayname}</a></td><td>{size_str}</td><td>{mtime}</td></tr>')
             else:
                 r.append(f'<tr id="row-{row_id}"><td>{chk_box}</td><td><a href="{linkname}" {a_class}>{escaped_displayname}</a></td><td>{size_str}</td><td>{mtime}</td></tr>')
             
@@ -174,7 +174,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('function saveFolderScroll(folderName) {')
         r.append('  sessionStorage.setItem("scrollTarget:" + window.location.pathname, folderName);')
         r.append('}')
-        r.append('window.addEventListener("DOMContentLoaded", function() {')
+        r.append('window.addEventListener("pageshow", function(event) {')
         r.append('  let key = "scrollTarget:" + window.location.pathname;')
         r.append('  let target = sessionStorage.getItem(key);')
         r.append('  if (target) {')
@@ -183,10 +183,12 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('    for (let row of rows) {')
         r.append('      let link = row.querySelector("a");')
         r.append('      if (link && link.textContent.trim().replace(/^📁\\s*/, "").replace(/\\/$/, "") === target) {')
-        r.append('        row.scrollIntoView({ behavior: "smooth", block: "center" });')
-        r.append('        row.style.transition = "background 0.5s";')
-        r.append('        row.style.background = "#fffbcc";')
-        r.append('        setTimeout(() => { row.style.background = ""; }, 2000);')
+        r.append('        setTimeout(function() {')
+        r.append('          row.scrollIntoView({ behavior: "smooth", block: "center" });')
+        r.append('          row.style.transition = "background 0.5s";')
+        r.append('          row.style.background = "#fffbcc";')
+        r.append('          setTimeout(() => { row.style.background = ""; }, 2000);')
+        r.append('        }, 50);')
         r.append('        break;')
         r.append('      }')
         r.append('    }')
