@@ -1,0 +1,13 @@
+# Test directories created by scripts
+test_comics/
+test_csv_library/
+
+# Data files
+*.csv
+*.md
+*.txt
+
+# Old/backup scripts
+old_py_scripts/
+sh scripts/
+action_explorer_v01.py
