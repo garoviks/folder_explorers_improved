@@ -5,6 +5,7 @@
 # Description:      Extracts and then merges multiple .cbz/.cbr archives into
 #                   a single new .cbz file, followed by a cleanup of original
 #                   files and temporary folders.
+# Version:          v02
 # Usage:            python3 makecbz.py [pattern] [output_name]
 #                   If no arguments are provided, it defaults to processing
 #                   all *.cbz and *.cbr files in the current directory,

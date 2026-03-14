@@ -4,8 +4,6 @@ test_csv_library/
 
 # Data files
 *.csv
-*.md
-*.txt
 
 # Old/backup scripts
 old_py_scripts/
