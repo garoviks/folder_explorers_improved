@@ -36,7 +36,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
             os.chdir(abs_path)
             
             # Prepare the command
-            cmd = ["python3", "/home/nesha/scripts/makecbz.py", pattern, outname, "--dry-run"]
+            cmd = ["python3", "/home/nesha/scripts/makecbz.py", pattern, outname]
             
             # Execute
             result = subprocess.run(cmd, capture_output=True, text=True)
@@ -203,7 +203,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('</div>')
         
         r.append('<div id="executionOutput">')
-        r.append('  <h3>Terminal Output (Dry Run)</h3>')
+        r.append('  <h3>Terminal Output</h3>')
         r.append('  <div id="outputContent"></div>')
         r.append('</div>')
         
@@ -320,7 +320,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('  let msg = "Selected files:\\n\\n" + files.join("\\n");')
         r.append('  if (cmdInfo && !cmdInfo.warning) {')
         r.append('    let absPath = document.getElementById("currentAbsPath").value;')
-        r.append('    let fullCmd = `python3 "/home/nesha/scripts/makecbz.py" "${cmdInfo.pattern}" "${cmdInfo.outname}" --dry-run`;')
+        r.append('    let fullCmd = `python3 "/home/nesha/scripts/makecbz.py" "${cmdInfo.pattern}" "${cmdInfo.outname}"`;')
         r.append('    msg += "\\n\\nProposed Command:\\n" + fullCmd;')
         r.append('  }')
         r.append('  alert(msg);')
@@ -387,7 +387,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('  let contentDiv = document.getElementById("outputContent");')
         r.append('  ')
         r.append('  outputDiv.style.display = "block";')
-        r.append('  contentDiv.innerText = "Executing dry-run...\\n";')
+        r.append('  contentDiv.innerText = "Executing command...\\n";')
         r.append('  outputDiv.scrollIntoView({ behavior: "smooth" });')
         r.append('  ')
         r.append('  fetch("/", {')
