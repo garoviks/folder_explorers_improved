@@ -79,7 +79,8 @@ def determine_paths_and_names(args):
     # Otherwise, it goes into the current folder.
     if args.pattern and args.output_name:
         final_output_destination_dir = current_folder / output_name_base
-        os.makedirs(final_output_destination_dir, exist_ok=True)
+        if not args.dry_run:
+            os.makedirs(final_output_destination_dir, exist_ok=True)
         is_output_folder_created = True  # Set flag if a new output folder is created
         print(f"Final merged CBZ will be placed temporarily in: '{final_output_destination_dir}'")
     else:
@@ -89,8 +90,11 @@ def determine_paths_and_names(args):
     # Create a dedicated temporary directory for all extractions
     # This ensures original archives are not in the same directory as extracted content during zipping
     temp_extraction_root_dir = current_folder / "makecbz_working_temp"
-    os.makedirs(temp_extraction_root_dir, exist_ok=True)
-    print(f"Temporary extraction directory created: '{temp_extraction_root_dir}'")
+    if not args.dry_run:
+        os.makedirs(temp_extraction_root_dir, exist_ok=True)
+        print(f"Temporary extraction directory created: '{temp_extraction_root_dir}'")
+    else:
+        print(f"  [DRY RUN] Would create temporary extraction directory: '{temp_extraction_root_dir}'")
 
     files_found = []
 
