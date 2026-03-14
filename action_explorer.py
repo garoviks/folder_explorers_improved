@@ -12,9 +12,48 @@ import sys
 import urllib.parse
 import html
 import datetime
+import json
+import subprocess
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 
 class CustomHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        return super().do_GET()
+
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data = json.loads(post_data)
+        
+        abs_path = data.get('abs_path')
+        pattern = data.get('pattern')
+        outname = data.get('outname')
+        
+        # Security: ensure we are running on the system
+        try:
+            # Change to the target directory
+            cwd = os.getcwd()
+            os.chdir(abs_path)
+            
+            # Prepare the command
+            cmd = ["python3", "/home/nesha/scripts/makecbz.py", pattern, outname, "--dry-run"]
+            
+            # Execute
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            
+            output = result.stdout + result.stderr
+            os.chdir(cwd)
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'output': output}).encode())
+            
+        except Exception as e:
+            self.send_response(500)
+            self.end_headers()
+            self.wfile.write(json.dumps({'error': str(e)}).encode())
+
     def list_directory(self, path):
         try:
             list_dir = os.listdir(path)
@@ -55,7 +94,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('.modal-content { background-color: #1e1e1e; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 8px; color: white; text-align: center; }')
         r.append('.close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }')
         r.append('.close:hover { color: white; }')
-        r.append('.cmd-box { background: #121212; padding: 15px; margin: 20px 0; border-radius: 4px; font-family: monospace; word-wrap: break-word; color: #4CAF50; border: 1px solid #333; }')
+        r.append('  .cmd-box { background: #eee; padding: 10px; font-family: monospace; overflow-x: auto; white-space: pre-wrap; margin-bottom: 20px; border-left: 5px solid #ccc; }')
+        r.append('  #executionOutput { display: none; margin-top: 30px; background: #1e1e1e; color: #d4d4d4; padding: 15px; font-family: "Courier New", Courier, monospace; border-radius: 5px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; box-shadow: inset 0 0 10px #000; border: 1px solid #333; }')
+        r.append('  #executionOutput h3 { color: #569cd6; margin-top: 0; font-size: 1em; border-bottom: 1px solid #333; padding-bottom: 5px; }')
         r.append('h1 { margin: 0; }')
         r.append('</style>')
         r.append('</head>\n<body>')
@@ -159,6 +200,11 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('    <div id="cmdText" class="cmd-box"></div>')
         r.append('    <button class="count-btn" onclick="copyModalCmd()">Copy Command</button>')
         r.append('  </div>')
+        r.append('</div>')
+        
+        r.append('<div id="executionOutput">')
+        r.append('  <h3>Terminal Output (Dry Run)</h3>')
+        r.append('  <div id="outputContent"></div>')
         r.append('</div>')
         
         # Scripts
@@ -267,8 +313,17 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('function showSelected() {')
         r.append('  hideWarning();')
         r.append('  let files = getSelectedFiles();')
-        r.append('  if (files.length === 0) alert("No files available!");')
-        r.append('  else alert("Selected files:\\n\\n" + files.join("\\n"));')
+        if_no_files = '  if (files.length === 0) { alert("No files available!"); return; }'
+        r.append(if_no_files)
+        
+        r.append('  let cmdInfo = generateCBZParams(files);')
+        r.append('  let msg = "Selected files:\\n\\n" + files.join("\\n");')
+        r.append('  if (cmdInfo && !cmdInfo.warning) {')
+        r.append('    let absPath = document.getElementById("currentAbsPath").value;')
+        r.append('    let fullCmd = `python3 "/home/nesha/scripts/makecbz.py" "${cmdInfo.pattern}" "${cmdInfo.outname}" --dry-run`;')
+        r.append('    msg += "\\n\\nProposed Command:\\n" + fullCmd;')
+        r.append('  }')
+        r.append('  alert(msg);')
         r.append('}')
         
         r.append('function getGroupName(filename) {')
@@ -286,16 +341,31 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('  return name;')
         r.append('}')
         
+        r.append('function generateCBZParams(files) {')
+        r.append('  if (files.length <= 1) return null;')
+        r.append('  let groups = new Set();')
+        r.append('  files.forEach(f => groups.add(getGroupName(f)));')
+        r.append('  ')
+        r.append('  if (groups.size > 1) {')
+        r.append('    return { warning: true, groups: Array.from(groups) };')
+        r.append('  }')
+        r.append('  let groupPrefix = Array.from(groups)[0];')
+        r.append('  return {')
+        r.append('    pattern: groupPrefix + "*.*",')
+        r.append('    outname: groupPrefix + " v01"')
+        r.append('  };')
+        r.append('}')
+        
         r.append('function prepareCreateCBZ() {')
         r.append('  let files = getSelectedFiles();')
         r.append('  if (files.length <= 1) {')
         r.append('    alert("At least two files must be selected to create a merged CBZ!"); return;')
         r.append('  }')
-        r.append('  let groups = new Set();')
-        r.append('  files.forEach(f => groups.add(getGroupName(f)));')
+        r.append('  let cmdInfo = generateCBZParams(files);')
         r.append('  let warningDiv = document.getElementById("topWarning");')
         r.append('  if (warningDiv) warningDiv.style.display = "none";')
-        r.append('  if (groups.size > 1) {')
+        r.append('  ')
+        r.append('  if (cmdInfo.warning) {')
         r.append('    if (!warningDiv) {')
         r.append('      warningDiv = document.createElement("div");')
         r.append('      warningDiv.id = "topWarning";')
@@ -307,22 +377,42 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('      warningDiv.style.fontWeight = "bold";')
         r.append('      document.body.insertBefore(warningDiv, document.body.firstChild);')
         r.append('    }')
-        r.append('    warningDiv.innerText = "WARNING: More than one file group detected: " + Array.from(groups).map(s => "\\"" + s + "\\"").join(", ");')
+        r.append('    warningDiv.innerText = "WARNING: More than one file group detected: " + cmdInfo.groups.map(s => "\\"" + s + "\\"").join(", ");')
         r.append('    warningDiv.style.display = "block";')
         r.append('    return;')
         r.append('  }')
-        r.append('  let groupPrefix = Array.from(groups)[0];')
-        r.append('  let pattern = groupPrefix + "*.*";')
-        r.append('  let outname = groupPrefix + " v01";')
+        r.append('  ')
         r.append('  let absPath = document.getElementById("currentAbsPath").value;')
-        r.append('  let cmd = `cd "${absPath}" && python3 "/home/nesha/scripts/makecbz.py" "${pattern}" "${outname}" --dry-run`;')
-        r.append('  showModal(cmd);')
+        r.append('  let outputDiv = document.getElementById("executionOutput");')
+        r.append('  let contentDiv = document.getElementById("outputContent");')
+        r.append('  ')
+        r.append('  outputDiv.style.display = "block";')
+        r.append('  contentDiv.innerText = "Executing dry-run...\\n";')
+        r.append('  outputDiv.scrollIntoView({ behavior: "smooth" });')
+        r.append('  ')
+        r.append('  fetch("/", {')
+        r.append('    method: "POST",')
+        r.append('    headers: { "Content-Type": "application/json" },')
+        r.append('    body: json_stringify({')
+        r.append('      abs_path: absPath,')
+        r.append('      pattern: cmdInfo.pattern,')
+        r.append('      outname: cmdInfo.outname')
+        r.append('    })')
+        r.append('  })')
+        r.append('  .then(response => response.json())')
+        r.append('  .then(data => {')
+        r.append('    if (data.error) contentDiv.innerText += "ERROR: " + data.error;')
+        r.append('    else contentDiv.innerText += data.output;')
+        r.append('  })')
+        r.append('  .catch(err => {')
+        r.append('    contentDiv.innerText += "CONNECTION ERROR: " + err;')
+        r.append('  });')
         r.append('}')
         r.append('</script>')
         
         r.append('</body>\n</html>\n')
         
-        encoded = '\n'.join(r).encode(enc, 'surrogateescape')
+        encoded = '\n'.join(r).replace('json_stringify', 'JSON.stringify').encode(enc, 'surrogateescape')
         
         self.send_response(200)
         self.send_header("Content-type", "text/html; charset=%s" % enc)
