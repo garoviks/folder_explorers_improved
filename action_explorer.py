@@ -77,6 +77,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('<button class="count-btn" onclick="showSelected()">Show Selected</button>')
         r.append('<button class="count-btn" onclick="prepareCreateCBZ()">Create CBZ</button>')
         r.append('</div>')
+        r.append('</div>')
         r.append('<table>')
         r.append('<tr><th style="width: 30px;"></th><th>Name</th><th>Items</th><th>Size</th><th>Modified</th></tr>')
         
