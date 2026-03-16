@@ -100,7 +100,9 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('.modal-content { background-color: #1e1e1e; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 8px; color: white; text-align: center; }')
         r.append('.cmd-box { background: #eee; padding: 10px; font-family: monospace; overflow-x: auto; white-space: pre-wrap; margin-bottom: 20px; border-left: 5px solid #ccc; color: #333; }')
         r.append('#executionOutput { display: none; margin-top: 30px; background: #1e1e1e; color: #d4d4d4; padding: 15px; font-family: monospace; border-radius: 5px; border: 1px solid #333; }')
+        r.append('#topWarning { display: none; background: #ff9800; color: #000; padding: 10px; margin-bottom: 20px; border-radius: 4px; font-weight: bold; text-align: center; }')
         r.append('</style>\n</head>\n<body>')
+        r.append('<div id="topWarning">Some items were automatically deselected (Volume/Collected patterns detected).</div>')
         
         abs_path = os.path.abspath(path)
         
@@ -156,9 +158,20 @@ class CustomHandler(SimpleHTTPRequestHandler):
         r.append('<script>')
         r.append('let selectedFiles = new Set();')
         
-        r.append('function isVolume(name) { const skipPattern = /\\b(?:v\\d|vol\\.?\\s*\\d|t\\s*\\d|book\\s*\\d)\\b/i; return skipPattern.test(name); }')
+        r.append('function isVolume(name) { const skipPattern = /\\b(?:v|vol|book|t)\\.?\\s*\\d+|TPB|Omnibus|Collection|Graphic\\s*Novel|GN|HC|Scanlation|Complete/i; return skipPattern.test(name); }')
         
-        r.append('function updateSelectedFiles() { document.querySelectorAll(".item-chk").forEach(chk => { if(chk.checked && !isVolume(chk.value)) selectedFiles.add(chk.value); else { chk.checked = false; selectedFiles.delete(chk.value); } }); }')
+        r.append('function updateSelectedFiles() {')
+        r.append('  let skippedCount = 0;')
+        r.append('  document.querySelectorAll(".item-chk").forEach(chk => {')
+        r.append('    if(chk.checked) {')
+        r.append('      if(isVolume(chk.value)) { chk.checked = false; skippedCount++; selectedFiles.delete(chk.value); }')
+        r.append('      else { selectedFiles.add(chk.value); }')
+        r.append('    } else { selectedFiles.delete(chk.value); }')
+        r.append('  });')
+        r.append('  let w = document.getElementById("topWarning");')
+        r.append('  if(skippedCount > 0) { w.style.display = "block"; w.innerText = skippedCount + " item(s) skipped (Volume/Collected files are excluded from batch actions)."; }')
+        r.append('  else { w.style.display = "none"; }')
+        r.append('}')
         
         r.append('function getSelectedFiles() { updateSelectedFiles(); return Array.from(selectedFiles); }')
         
@@ -215,4 +228,3 @@ if __name__ == '__main__':
     httpd = HTTPServer(server_address, CustomHandler)
     print(f"Serving at http://localhost:8123/")
     httpd.serve_forever()
-    
