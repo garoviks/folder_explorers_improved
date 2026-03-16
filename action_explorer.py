@@ -1,6 +1,6 @@
 """
 Script: action_explorer.py
-Version: v02
+Version: v03
 Description: A custom HTTP web server that provides an interactive directory listing. 
 It displays folder contents with sizes and modification dates in a dark-themed UI, 
 and includes interactive features to count items and generate/copy terminal commands 
