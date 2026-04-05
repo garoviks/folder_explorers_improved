@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>UI Mockup — action_explorer</title>
+<style>
+  body { font-family: "Segoe UI", Roboto, sans-serif; margin: 2rem;
+         background: #121212; color: #e0e0e0; }
+  h1 { color: #fff; margin: 0; }
+  table { width: 100%; border-collapse: collapse; background: #1e1e1e;
+          border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #333; }
+  th { background: #2c2c2c; font-weight: 600; color: #fff; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: #2a2a2a; }
+  a { color: #64b5f6; text-decoration: none; font-weight: 500; display: block; }
+  .dir { color: #81c784; font-weight: bold; }
+  .btn { border: none; color: white; padding: 10px 20px; cursor: pointer;
+         border-radius: 4px; font-size: 15px; }
+  .green  { background: #4CAF50; } .blue   { background: #0288d1; }
+  .purple { background: #7b1fa2; } .red    { background: #c62828; }
+  .dkgreen{ background: #2e7d32; } .orange { background: #e65100; }
+  .header-container { display: flex; justify-content: space-between;
+                      align-items: center; margin-bottom: 20px; }
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+  .warning { background: #ff9800; color: #000; padding: 10px; margin-bottom: 16px;
+             border-radius: 4px; font-weight: bold; text-align: center; }
+  .output { background: #1e1e1e; color: #d4d4d4; padding: 15px; margin-top: 24px;
+            font-family: monospace; border-radius: 5px; border: 1px solid #333;
+            white-space: pre; font-size: 0.9em; }
+  .confirm-bar { display: flex; gap: 10px; margin-top: 12px; align-items: center;
+                 flex-wrap: wrap; }
+  input[type=text] { background: #2c2c2c; color: #fff; border: 1px solid #555;
+                     border-radius: 4px; padding: 6px 10px; font-size: 0.95em;
+                     width: 380px; }
+  .size  { color: #888; font-size: 0.9em; }
+  .count { color: #888; font-size: 0.9em; }
+  .note  { color: #555; font-size: 0.8em; font-style: italic; margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 1: Normal directory listing
+     ═══════════════════════════════════════════ -->
+
+<div class="header-container">
+  <div style="display:flex;align-items:center;gap:15px">
+    <button class="btn green">Select/Deselect All</button>
+    <h1>📁 Directory listing for /Comics/Robert Kirkman/</h1>
+  </div>
+  <div class="btn-group">
+    <button class="btn green">Show Selected</button>
+    <button class="btn green">Create CBZ</button>
+    <button class="btn blue">Rename</button>
+    <button class="btn purple">Check subfolders 4CBZing</button>
+  </div>
+</div>
+
+<table>
+  <tr>
+    <th style="width:30px"></th>
+    <th>Name</th><th>Items</th><th>Size</th><th>Modified</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td><a href="#" class="dir">📁 ../ (Parent Directory)</a></td>
+    <td>-</td><td>-</td><td>-</td>
+  </tr>
+  <tr>
+    <td><input type="checkbox"></td>
+    <td><a href="#" class="dir">📁 Invincible (Kirkman)/</a></td>
+    <td class="count" title="42 file(s), 3 folder(s)">45</td>
+    <td>-</td><td>2025-03-14 18:22:01</td>
+  </tr>
+  <tr>
+    <td><input type="checkbox"></td>
+    <td><a href="#" class="dir">📁 The Walking Dead/</a></td>
+    <td class="count" title="30 file(s), 0 folder(s)">30</td>
+    <td>-</td><td>2025-02-08 11:05:44</td>
+  </tr>
+  <tr>
+    <td><input type="checkbox" checked></td>
+    <td><a href="#">📄 Invincible 001.cbr</a></td>
+    <td>-</td><td class="size">28.4 MB</td><td>2024-11-01 09:13:00</td>
+  </tr>
+  <tr>
+    <td><input type="checkbox" checked></td>
+    <td><a href="#">📄 Invincible 002.cbr</a></td>
+    <td>-</td><td class="size">31.1 MB</td><td>2024-11-01 09:14:22</td>
+  </tr>
+  <tr>
+    <td><input type="checkbox" checked></td>
+    <td><a href="#">📄 Invincible 003.cbz</a></td>
+    <td>-</td><td class="size">29.8 MB</td><td>2024-11-01 09:15:55</td>
+  </tr>
+  <tr>
+    <td><input type="checkbox"></td>
+    <td><a href="#">📄 Invincible v01 - Family Matters (2003).cbz</a></td>
+    <td>-</td><td class="size">87.3 MB</td><td>2025-01-20 14:30:00</td>
+  </tr>
+</table>
+
+<hr style="border-color:#333;margin:40px 0 20px">
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 2: After clicking Create CBZ —
+     confirm bar with countdown visible
+     ═══════════════════════════════════════════ -->
+
+<p class="note">▼ SCREEN 2: After clicking "Create CBZ" — confirm bar shown, countdown running</p>
+
+<div class="output">Creating: Invincible v02 - Eight Is Enough (2003).cbz
+From 3 file(s):
+  Invincible 001.cbr
+  Invincible 002.cbr
+  Invincible 003.cbz
+</div>
+
+<div class="confirm-bar">
+  <button class="btn red">✖ Stop! (3)</button>
+  <button class="btn dkgreen">✔ Proceed now</button>
+  <button class="btn orange">✎ Rename</button>
+  <input type="text" value="Invincible v02 - Eight Is Enough (2003)" style="display:none">
+</div>
+
+<hr style="border-color:#333;margin:40px 0 20px">
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 3: Rename box opened,
+     countdown cancelled
+     ═══════════════════════════════════════════ -->
+
+<p class="note">▼ SCREEN 3: After clicking "✎ Rename" — edit box shown, countdown cancelled</p>
+
+<div class="output">Creating: Invincible v02 - Eight Is Enough (2003).cbz
+From 3 file(s):
+  Invincible 001.cbr
+  Invincible 002.cbr
+  Invincible 003.cbz
+</div>
+
+<div class="confirm-bar">
+  <button class="btn red">✖ Stop!</button>
+  <button class="btn dkgreen">✔ Proceed now</button>
+  <button class="btn orange">✎ Rename</button>
+  <input type="text" value="Invincible v02 - Eight Is Enough (2003)">
+</div>
+
+<hr style="border-color:#333;margin:40px 0 20px">
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 4: Execution output — in progress
+     ═══════════════════════════════════════════ -->
+
+<p class="note">▼ SCREEN 4: CBZ creation running — verbose output</p>
+
+<div class="output">[1/6] Working folder
+  ✔ Created: /Comics/Robert Kirkman/Invincible v02 - Eight Is Enough (2003)/
+
+[2/6] Extracting 3 file(s)
+
+  → Invincible 001.cbr  (.cbr)
+  · Subfolder: Invincible 001/
+  · Tool: unrar
+  ✔ 34 file(s) extracted
+
+  → Invincible 002.cbr  (.cbr)
+  · Tool: unrar
+  ✔ 33 file(s) extracted
+
+  → Invincible 003.cbz  (.cbz)
+  · Tool: unzip
+  ✔ 35 file(s) extracted
+
+[3/6] Zipping into Invincible v02 - Eight Is Enough (2003).cbz
+  ✔ Created Invincible v02 - Eight Is Enough (2003).cbz (87.1 MB)
+
+[4/6] Moving CBZ to destination
+  ✔ Moved: Invincible v02 - Eight Is Enough (2003).cbz
+
+[5/6] Deleting 3 original source file(s)
+  · Deleting: Invincible 001.cbr
+  ✔ Deleted.
+  · Deleting: Invincible 002.cbr
+  ✔ Deleted.
+  · Deleting: Invincible 003.cbz
+  ✔ Deleted.
+
+[6/6] Cleanup
+  ✔ Working folder removed.
+
+✔ Done: Invincible v02 - Eight Is Enough (2003).cbz
+
+--- Refreshing in 8 seconds... ---</div>
+
+<hr style="border-color:#333;margin:40px 0 20px">
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 5: Volume warning banner
+     ═══════════════════════════════════════════ -->
+
+<p class="note">▼ SCREEN 5: Warning banner — volume file auto-deselected</p>
+
+<div class="warning">1 item(s) skipped — Volume/Collected editions are excluded from batch actions.</div>
+
+<table>
+  <tr>
+    <th style="width:30px"></th><th>Name</th><th>Items</th><th>Size</th><th>Modified</th>
+  </tr>
+  <tr>
+    <td><input type="checkbox" checked></td>
+    <td><a href="#">📄 Invincible 001.cbr</a></td>
+    <td>-</td><td class="size">28.4 MB</td><td>2024-11-01 09:13:00</td>
+  </tr>
+  <tr>
+    <td><input type="checkbox"></td>
+    <td><a href="#">📄 Invincible v01 - Family Matters (2003).cbz</a></td>
+    <td>-</td><td class="size">87.3 MB</td><td>2025-01-20 14:30:00</td>
+  </tr>
+</table>
+
+</body>
+</html>
