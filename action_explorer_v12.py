@@ -22,7 +22,7 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 
 COMIC_EXTS = {'.cbz', '.cbr', '.zip', '.rar'}
 VOLUME_PATTERN = re.compile(
-    r'\b(?:v|vol|book|t)\.?\s*\d+|TPB|Omnibus|Collection|Graphic\s*Novel|GN|HC|Scanlation|Complete',
+    r'\b(?:v|vol|book|t)\.?\s*\d+|TPB|Omnibus|Collection|Graphic\s*Novel|GN|HC|Complete',
     re.IGNORECASE
 )
 
@@ -690,7 +690,7 @@ let cbzCountdownInterval = null;
 const CBZ_COUNTDOWN_SECS = 4;
 
 function isVolume(name) {
-  const skipPattern = /\\b(?:v|vol|book|t)\\.?\\s*\\d+|TPB|Omnibus|Collection|Graphic\\s*Novel|GN|HC|Scanlation|Complete/i;
+  const skipPattern = /\\b(?:v|vol|book|t)\\.?\\s*\\d+|TPB|Omnibus|Collection|Graphic\\s*Novel|GN|HC|Complete/i;
   return skipPattern.test(name);
 }
 

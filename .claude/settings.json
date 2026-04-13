@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/nesha/Downloads/comics_download/**)",
+      "Read(//mnt/extramedia/Comics/**)"
+    ]
+  }
+}
